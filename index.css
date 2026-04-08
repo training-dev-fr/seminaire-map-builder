@@ -5,6 +5,7 @@ body {
     width: 100%;
     height: 100vh;
     margin: 0;
+    overflow: hidden; /* Empêche le scroll sur tout le body */
 }
 
 .menu {
@@ -15,6 +16,8 @@ body {
     background-color: #303030;
     height: 100%;
     color: white;
+    box-sizing: border-box; /* S'assure que le padding ne dépasse pas des 100% de hauteur */
+    overflow-y: auto; /* Ajoute un scroll au menu complet si l'écran est petit */
 }
 
 .menu .form-group {
@@ -25,9 +28,11 @@ body {
 
 .canvas {
     width: 80%;
+    height: 100%;
     display: flex;
     justify-content: center;
-
+    align-items: center;
+    overflow: auto; /* Permet au canvas de scroller s'il est plus grand que l'écran */
 }
 
 canvas {
@@ -52,6 +57,35 @@ button {
     cursor: pointer;
 }
 
+/* Zone des tuiles avec scroll */
+.tuile {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-height: 400px; /* Limite la hauteur de la zone des tuiles */
+    overflow-y: auto; /* Ajoute la barre de défilement (slider) verticalement */
+    padding: 10px;
+    background-color: #252525; /* Légèrement plus foncé pour bien différencier la zone */
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+/* Customisation de la scrollbar pour qu'elle s'intègre au design sombre */
+.tuile::-webkit-scrollbar {
+    width: 8px;
+}
+.tuile::-webkit-scrollbar-track {
+    background: #303030;
+    border-radius: 4px;
+}
+.tuile::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+.tuile::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
 .tuile button{
     background-color: transparent;
     border: 2px solid transparent;
@@ -65,11 +99,19 @@ button {
     transform: scale(1.03);
 }
 
+.tools {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
 .tools button {
     font-size: 28px;
     background-color: #e0e0e0;
+    color: #333; /* Rendre l'icone visible sur le gris */
 }
 
-.tools button.active{
+.tools button.active {
     background-color: #1565c0;
+    color: white;
 }

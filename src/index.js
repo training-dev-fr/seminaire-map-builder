@@ -4,7 +4,7 @@ import { createAppState } from "./state/appState.js";
 import { parseMapData, resizeMapData, syncMapJson } from "./state/mapData.js";
 import { dom } from "./ui/dom.js";
 import loadTileButton from "./tiles/tileLoader.js";
-import loadTile from "./tiles/tileManager.js";
+import loadTile, { loadTileFromBlob } from "./tiles/tileManager.js";
 
 const state = createAppState();
 window.mapBuilderState = state;
@@ -14,6 +14,8 @@ async function initialize() {
 
     loadTileButton(state.baseField, dom.tileContainer, (selectedTile) => {
         state.currentTile = selectedTile;
+        state.currentRotation = 0; // Réinitialise la rotation quand on change de tuile
+        updateRotationUI();
     });
 
     bindCanvasEvents();
@@ -21,6 +23,7 @@ async function initialize() {
     bindSizeControls();
     bindExportButtons();
     bindImportButton();
+    bindImportTilesetButton();
 
     dom.changeSizeButton.click();
 }
@@ -40,6 +43,20 @@ function bindToolButtons() {
             state.currentTool = event.currentTarget.dataset.id;
         });
     });
+
+    dom.rotateButton.addEventListener("click", () => {
+        state.currentRotation = (state.currentRotation + 90) % 360;
+        updateRotationUI();
+    });
+}
+
+function updateRotationUI() {
+    // Fait tourner l'icône du bouton pour indiquer la rotation actuelle
+    const icon = dom.rotateButton.querySelector('i');
+    if (icon) {
+        icon.style.transform = `rotate(${state.currentRotation}deg)`;
+        icon.style.transition = 'transform 0.2s';
+    }
 }
 
 function bindSizeControls() {
@@ -110,6 +127,38 @@ function bindImportButton() {
             renderMap(dom.context, state);
         } catch (error) {
             window.alert(error.message);
+        } finally {
+            event.currentTarget.value = "";
+        }
+    });
+}
+
+function bindImportTilesetButton() {
+    dom.importTilesetButton.addEventListener("click", () => {
+        dom.importTilesetFileInput.click();
+    });
+
+    dom.importTilesetFileInput.addEventListener("change", async (event) => {
+        const [file] = event.currentTarget.files;
+        if (!file) return;
+
+        try {
+            const tileWidth = parseInt(dom.tileWidthInput.value, 10) || 16;
+            const tileHeight = parseInt(dom.tileHeightInput.value, 10) || 16;
+            
+            const newTileSet = await loadTileFromBlob(file, tileWidth, tileHeight);
+            state.baseField = newTileSet;
+            
+            loadTileButton(state.baseField, dom.tileContainer, (selectedTile) => {
+                state.currentTile = selectedTile;
+                state.currentRotation = 0;
+                updateRotationUI();
+            });
+            
+            // Redraw map with new tiles
+            renderMap(dom.context, state);
+        } catch (error) {
+            window.alert("Erreur lors de l'import du tileset : " + error.message);
         } finally {
             event.currentTarget.value = "";
         }

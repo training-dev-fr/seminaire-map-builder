@@ -27,6 +27,16 @@
             </div>
         </div>
         <label for="">Textures</label>
+        <div class="form-group">
+            <label for="tile-width">Taille X (px)</label>
+            <input type="number" name="tile-width" id="tile-width" value="16" style="width: 50px;">
+            <label for="tile-height">Taille Y (px)</label>
+            <input type="number" name="tile-height" id="tile-height" value="16" style="width: 50px;">
+        </div>
+        <div class="form-group">
+            <button id="import-tileset">Importer Tileset</button>
+            <input id="import-tileset-file" type="file" accept="image/*" hidden>
+        </div>
         <div class="tuile">
 
         </div>
@@ -40,6 +50,12 @@
             </button>
             <button data-id="erase">
                 <i class="fa-solid fa-eraser" title="effacer" ></i>
+            </button>
+        </div>
+        <label for="">Rotation tuile</label>
+        <div class="tools">
+            <button data-id="rotate">
+                <i class="fa-solid fa-rotate-right" title="pivoter de 90 degres" ></i>
             </button>
         </div>
         <div class="form-group">

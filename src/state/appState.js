@@ -7,6 +7,7 @@ export function createAppState() {
     return {
         baseField: null,
         currentTile: null,
+        currentRotation: 0, // Rotation de la tuile en cours en degrés (0, 90, 180, 270)
         currentTool: "pen",
         currentSize: {
             width: config.defaultWidth,

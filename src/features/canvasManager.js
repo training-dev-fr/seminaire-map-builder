@@ -63,12 +63,17 @@ export function getCellFromEvent(event, size) {
     };
 }
 
-export function drawTile(context, tileSet, size, x, y, tileIndex) {
-    drawTileWithOptions(context, tileSet, size, x, y, tileIndex);
+export function drawTile(context, tileSet, size, x, y, tileObject) {
+    drawTileWithOptions(context, tileSet, size, x, y, tileObject);
 }
 
-export function drawTileWithOptions(context, tileSet, size, x, y, tileIndex, options = {}) {
-    if (!tileSet || tileSet.listItem[tileIndex] === undefined) {
+export function drawTileWithOptions(context, tileSet, size, x, y, tileObject, options = {}) {
+    if (!tileSet || !tileObject) return;
+
+    let tileIndex = typeof tileObject === 'number' ? tileObject : tileObject.index;
+    let rotation = typeof tileObject === 'number' ? 0 : tileObject.rotation || 0;
+
+    if (tileSet.listItem[tileIndex] === undefined) {
         return;
     }
 
@@ -81,13 +86,40 @@ export function drawTileWithOptions(context, tileSet, size, x, y, tileIndex, opt
     const offsetX = x * cellWidth;
     const offsetY = y * cellHeight;
 
-    context.drawImage(
-        tileSet.listItem[tileIndex],
-        offsetX,
-        offsetY,
-        squareWidth,
-        squareHeight,
-    );
+    const tileImage = tileSet.listItem[tileIndex];
+
+    if (rotation !== 0) {
+        // Sauvegarde le contexte actuel
+        context.save();
+        
+        // Déplace le point d'origine au centre de la tuile
+        const centerX = offsetX + squareWidth / 2;
+        const centerY = offsetY + squareHeight / 2;
+        context.translate(centerX, centerY);
+        
+        // Rotation (conversion de degrés en radians)
+        context.rotate((rotation * Math.PI) / 180);
+        
+        // Dessine la tuile centrée sur 0,0
+        context.drawImage(
+            tileImage,
+            -squareWidth / 2,
+            -squareHeight / 2,
+            squareWidth,
+            squareHeight
+        );
+        
+        // Restaure le contexte pour ne pas affecter les autres dessins
+        context.restore();
+    } else {
+        context.drawImage(
+            tileImage,
+            offsetX,
+            offsetY,
+            squareWidth,
+            squareHeight,
+        );
+    }
 }
 
 export function eraseTile(context, size, x, y) {
@@ -107,14 +139,19 @@ export function eraseTile(context, size, x, y) {
 }
 
 export function applyTool(context, state, position) {
-    const { currentTool, currentTile, currentSize, baseField } = state;
+    const { currentTool, currentTile, currentRotation, currentSize, baseField } = state;
+
+    if (currentTile === null && currentTool !== "erase") return;
+
+    // Construit l'objet tuile avec index et rotation
+    const tileObject = { index: currentTile, rotation: currentRotation };
 
     switch (currentTool) {
         case "fill": {
-            const updatedCells = floodFillCells(state.mapData, position.x, position.y, currentTile);
+            const updatedCells = floodFillCells(state.mapData, position.x, position.y, tileObject);
 
             updatedCells.forEach((cell) => {
-                drawTileWithOptions(context, baseField, currentSize, cell.x, cell.y, currentTile);
+                drawTileWithOptions(context, baseField, currentSize, cell.x, cell.y, tileObject);
             });
 
             syncMapJson(state);
@@ -127,8 +164,8 @@ export function applyTool(context, state, position) {
             return;
         case "pen":
         default:
-            drawTile(context, baseField, currentSize, position.x, position.y, currentTile);
-            setCell(state.mapData, position.x, position.y, currentTile);
+            drawTileWithOptions(context, baseField, currentSize, position.x, position.y, tileObject);
+            setCell(state.mapData, position.x, position.y, tileObject);
             syncMapJson(state);
     }
 }
@@ -143,8 +180,8 @@ export function renderMap(context, state, options = {}) {
     }
 
     state.mapData.cells.forEach((row, y) => {
-        row.forEach((tileIndex, x) => {
-            if (tileIndex === null) {
+        row.forEach((tileObject, x) => {
+            if (tileObject === null) {
                 return;
             }
 
@@ -154,7 +191,7 @@ export function renderMap(context, state, options = {}) {
                 state.currentSize,
                 x,
                 y,
-                tileIndex,
+                tileObject,
                 { gap: showGrid ? 1 : 0 },
             );
         });

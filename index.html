@@ -1,13 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
+
 <body>
-    <canvas width="500" height="500"></canvas>
+    <div class="menu">
+        <div class="size">
+            <div class="form-group">
+                <label for="">Largeur</label>
+                <input type="text" name="" id="width" value="10">
+            </div>
+            <div class="form-group">
+                <label for="">Hauteur</label>
+                <input type="text" name="" id="height" value="10">
+            </div>
+            <div class="form-group">
+                <button id="change-size">Appliquer</button>
+            </div>
+        </div>
+        <label for="">Textures</label>
+        <div class="tuile">
+
+        </div>
+        <label for="">Outils</label>
+        <div class="tools">
+            <button data-id="pen">
+                <i class="fa-solid fa-pen" title="case" ></i>
+            </button>
+            <button data-id="fill">
+                <i class="fa-solid fa-fill" title="remplir" ></i>
+            </button>
+            <button data-id="erase">
+                <i class="fa-solid fa-eraser" title="effacer" ></i>
+            </button>
+        </div>
+    </div>
+    <div class="canvas">
+        <canvas width="800" height="800"></canvas>
+    </div>
     <script src="index.js" type="module"></script>
 </body>
+
 </html>

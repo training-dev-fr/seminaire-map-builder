@@ -14,7 +14,7 @@ async function initialize() {
 
     loadTileButton(state.baseField, dom.tileContainer, (selectedTile) => {
         state.currentTile = selectedTile;
-        state.currentRotation = 0; // Réinitialise la rotation quand on change de tuile
+        state.currentRotation = 0;
         updateRotationUI();
     });
 
@@ -51,7 +51,6 @@ function bindToolButtons() {
 }
 
 function updateRotationUI() {
-    // Fait tourner l'icône du bouton pour indiquer la rotation actuelle
     const icon = dom.rotateButton.querySelector('i');
     if (icon) {
         icon.style.transform = `rotate(${state.currentRotation}deg)`;
@@ -155,7 +154,6 @@ function bindImportTilesetButton() {
                 updateRotationUI();
             });
             
-            // Redraw map with new tiles
             renderMap(dom.context, state);
         } catch (error) {
             window.alert("Erreur lors de l'import du tileset : " + error.message);

@@ -26,13 +26,10 @@ export function setCell(mapData, x, y, value) {
     mapData.cells[y][x] = value;
 }
 
-// Compare 2 tiles object to see if they are the same
 function isSameTile(cell1, cell2) {
     if (cell1 === null && cell2 === null) return true;
     if (cell1 === null || cell2 === null) return false;
-    // Si ce sont juste des nombres (ancien code)
     if (typeof cell1 === 'number' && typeof cell2 === 'number') return cell1 === cell2;
-    // Si ce sont des objets avec index et rotation
     return cell1.index === cell2.index && cell1.rotation === cell2.rotation;
 }
 
@@ -101,15 +98,12 @@ export function parseMapData(jsonContent) {
             throw new Error("Les lignes du JSON ne correspondent pas a la taille indiquee.");
         }
 
-        // Migration automatique des anciens JSON (nombres) vers objets de tuiles
         for (let i = 0; i < row.length; i++) {
             const cell = row[i];
             if (cell !== null) {
                 if (typeof cell === 'number') {
-                    // C'est un ancien format, on le convertit
                     row[i] = { index: cell, rotation: 0 };
                 } else if (typeof cell === 'object' && 'index' in cell && 'rotation' in cell) {
-                    // Format valide, on ne fait rien
                 } else {
                     throw new Error("Format de cellule non reconnu.");
                 }

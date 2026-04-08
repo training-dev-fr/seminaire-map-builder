@@ -22,8 +22,6 @@ export default async function loadTile(file, countX, countY) {
     const response = await fetch(`../tiles/${file}`);
     const blob = await response.blob();
     
-    // Pour la rétrocompatibilité avec votre ancien code (tiles3.png avec 5 colonnes et 5 lignes)
-    // On calcule la taille de la tuile en px pour l'image par défaut.
     const image = await createImageBitmap(blob);
     const tileWidth = image.width / countX;
     const tileHeight = image.height / countY;

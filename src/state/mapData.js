@@ -26,10 +26,17 @@ export function setCell(mapData, x, y, value) {
     mapData.cells[y][x] = value;
 }
 
+function isSameTile(cell1, cell2) {
+    if (cell1 === null && cell2 === null) return true;
+    if (cell1 === null || cell2 === null) return false;
+    if (typeof cell1 === 'number' && typeof cell2 === 'number') return cell1 === cell2;
+    return cell1.index === cell2.index && cell1.rotation === cell2.rotation;
+}
+
 export function floodFillCells(mapData, startX, startY, nextValue) {
     const targetValue = getCell(mapData, startX, startY);
 
-    if (targetValue === undefined || targetValue === nextValue) {
+    if (isSameTile(targetValue, nextValue)) {
         return [];
     }
 
@@ -47,7 +54,7 @@ export function floodFillCells(mapData, startX, startY, nextValue) {
 
         visitedCells.add(cellKey);
 
-        if (getCell(mapData, cell.x, cell.y) !== targetValue) {
+        if (!isSameTile(getCell(mapData, cell.x, cell.y), targetValue)) {
             continue;
         }
 
@@ -91,11 +98,17 @@ export function parseMapData(jsonContent) {
             throw new Error("Les lignes du JSON ne correspondent pas a la taille indiquee.");
         }
 
-        row.forEach((cell) => {
-            if (cell !== null && !Number.isInteger(cell)) {
-                throw new Error("Les cellules doivent contenir un index de tuile ou null.");
+        for (let i = 0; i < row.length; i++) {
+            const cell = row[i];
+            if (cell !== null) {
+                if (typeof cell === 'number') {
+                    row[i] = { index: cell, rotation: 0 };
+                } else if (typeof cell === 'object' && 'index' in cell && 'rotation' in cell) {
+                } else {
+                    throw new Error("Format de cellule non reconnu.");
+                }
             }
-        });
+        }
     });
 
     return {
